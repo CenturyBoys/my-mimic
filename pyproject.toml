@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "mr-mime"
+version = "0.1.0"
+description = "Cache package"
+authors = ["Marco Sievers de Almeida Ximit Gaia <im.ximit@gmail.com>"]
+license = "Apache License 2.0"
+readme = "README.md"
+packages = [
+    { include = "mr_mime"},
+    { include = "mr_mime/**/*.py" },
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+meeseeks-singleton = "^0.4.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
