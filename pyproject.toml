@@ -6,8 +6,8 @@ authors = ["Marco Sievers de Almeida Ximit Gaia <im.ximit@gmail.com>"]
 license = "Apache License 2.0"
 readme = "README.md"
 packages = [
-    { include = "mr_mime"},
-    { include = "mr_mime/**/*.py" },
+    { include = "mr"},
+    { include = "mr/**/*.py" },
 ]
 
 
@@ -15,6 +15,13 @@ packages = [
 python = "^3.10"
 meeseeks-singleton = "^0.4.2"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^4.0.0"
+mutatest = "^3.1.0"
+pylint = "^2.17.1"
+freezegun = "^1.2.2"
+pytest-asyncio = "^0.21.0"
 
 [build-system]
 requires = ["poetry-core"]

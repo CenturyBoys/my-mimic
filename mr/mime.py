@@ -1,33 +1,49 @@
+"""
+Mr Mime is a function decorator for cache/memoization
+"""
+
 import hashlib
 import inspect
 from typing import TypeVar
 
 import meeseeks
 
-from mr_mime.config import Config
-from mr_mime.states.factory import StateFactory
-from mr_mime.states.interface import IState
-from mr_mime.states.type import StateType
+from mr.config import Config
+from mr.states.implementations.memory import MemoryState
+from mr.states.interface import IState
 
 T = TypeVar("T")
 
 
-@meeseeks.OnlyOne(by_args_hash=True)
+singleton_container = meeseeks.OnlyOne(by_args_hash=True)
+
+
+@singleton_container
 class Mime:
-    _config: Config = Config(type=StateType.MEMORY)
+    """
+    Decorator to aplay cache/memoization on your functions
+    """
+
+    _config: Config = Config(state=MemoryState)
     _state: IState = None
 
     @classmethod
     def set_config(cls, config: Config):
+        """
+        Replace the default config
+
+        :param config: Config. IS a instance os Config class
+        :return: None
+        """
         cls._config = config
 
-    def __init__(self, ttl: int):
+    def __init__(self, ttl: int = None):
         self._ttl = ttl
 
     @classmethod
-    def acquire_state(cls) -> IState:
+    def _acquire_state(cls) -> IState:
         if cls._state is None:
-            cls._state = StateFactory.get_state(config=cls._config)
+            cls._state = cls._config.state()
         return cls._state
 
     @staticmethod
@@ -45,9 +61,10 @@ class Mime:
         is_async = inspect.iscoroutinefunction(function)
 
         if is_async:
+
             async def async_mimic(*args, **kwargs):
                 args_hash = self._hash_args(args=args, kwargs=kwargs)
-                state = self.acquire_state()
+                state = self._acquire_state()
                 if cached_value := await state.async_get(key=args_hash):
                     return cached_value
                 value = await function(*args, **kwargs)
@@ -56,9 +73,10 @@ class Mime:
 
             mimic = async_mimic
         else:
+
             def sync_mimic(*args, **kwargs):
                 args_hash = self._hash_args(args=args, kwargs=kwargs)
-                state = self.acquire_state()
+                state = self._acquire_state()
                 if cached_value := state.sync_get(key=args_hash):
                     return cached_value
                 value = function(*args, **kwargs)
@@ -68,19 +86,3 @@ class Mime:
             mimic = sync_mimic
         mimic.__wrapped__ = function
         return mimic
-
-
-if __name__ == "__main__":
-    import time
-
-    @Mime(ttl=1)
-    def teste(a, b, c):
-        print("entrou")
-        return a + b + c
-
-    a = teste(1,2,3)
-    b = teste(1,2,3)
-    time.sleep(2)
-    c = teste(1, 2, 3)
-    d = teste(2, 2, 3)
-    print()
