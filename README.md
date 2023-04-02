@@ -1,4 +1,4 @@
-# Mr Mime
+# My Mimic
 ```
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣶⣶⣦⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⢠⢊⢽⣝⡆⣫⣷⣌⣦⣤⡐⠾⣿⣷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿⣾⣯⣿⣯⣷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -33,11 +33,11 @@
 ```
 
 
-Mr Mime is a function decorator for cache/memoization. They use the args and kwargs to create a hash to storage the function call result after the first call all function invoke will use already storage result.  
+My Mimic is a function decorator for cache/memoization. They use the args and kwargs to create a hash to storage the function call result after the first call all function invoke will use already storage result.  
 
 ### Configuration
 
-Mime allowed you to use the default config or create a self one. By default, an in-memory state are used you can implement your own state resolver using the interface IState.
+Using `mr.Mime` from Mimic allowed you to use the default config or create a self one. By default, an in-memory state are used you can implement your own state resolver using the interface IState.
 
 Below you can see the interface contract
 ```python
@@ -86,7 +86,7 @@ class IState(ABC):
 
 ```
 
-To configure a new state you need to use `Mime.set_config` function passing a config instance.
+To configure a new state you need to use `mr.Mime.set_config` function passing a config instance.
 
 ```python
 import mr
@@ -109,7 +109,7 @@ mr.Mime.set_config(config=mr.Config(state=MyState))
 
 ### How to use
 
-Mime is a decorator that receive a ttl as argument. That means the ttl is the seconds that the cache will have to live. Set None to never die.
+For that we use `mr.Mime` as decorator that receive a ttl as argument. That means the ttl is the seconds that the cache will have to live. Set None to never die.
 
 Mime works fine with sync and async functions too.
 
