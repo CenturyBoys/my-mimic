@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "mr-mime"
+name = "my-mimic"
 version = "0.1.0"
-description = "Cache package"
+description = "Cache/Memoization package"
 authors = ["Marco Sievers de Almeida Ximit Gaia <im.ximit@gmail.com>"]
 license = "Apache License 2.0"
 readme = "README.md"
