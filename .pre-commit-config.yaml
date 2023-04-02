@@ -38,4 +38,3 @@ repos:
           "mr",
         ]
       pass_filenames: false
-      always_run: true
