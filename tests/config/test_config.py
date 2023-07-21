@@ -13,6 +13,9 @@ def test_config_error():
 
 
 class StubState(IState):
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+
     def sync_get(self, key: str):
         pass
 
@@ -27,6 +30,8 @@ class StubState(IState):
 
 
 def test_config():
-
-    config = Config(state=StubState)
+    kwargs = {"key": "value"}
+    config = Config(state=StubState, kwargs=kwargs)
     assert issubclass(config.state, StubState)
+    assert isinstance(config._state, StubState)
+    assert config.kwargs == kwargs

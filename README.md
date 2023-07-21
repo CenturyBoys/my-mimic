@@ -86,7 +86,7 @@ class IState(ABC):
 
 ```
 
-To configure a new state you need to use `mr.Mime.set_config` function passing a config instance.
+To configure a new state you need to use `mr.Mime.set_config` function passing a config instance. The config accepts a `kwargs: dict` parameter, this parameter will be sent to the state instance. 
 
 ```python
 import mr
@@ -104,8 +104,37 @@ class MyState(mr.IState):
     async def async_set(self, key: str, value: any, ttl: int = None):
         pass
 
-mr.Mime.set_config(config=mr.Config(state=MyState))
+mr.Mime.set_config(config=mr.Config(state=MyState, kwargs={"KEY": "value"}))
 ```
+
+### Extras
+
+For default a memory-state is allways set. But we also have extras states see below the list:
+
+#### Redis
+
+This extra add the redis [package](https://pypi.org/project/redis/) in version `^4.6.0`. All result will be `serialized` to be stored and `unserialized` to be returned using the [pickle lib](https://docs.python.org/3/library/pickle.html).
+
+How to install extra packages?
+
+```shell
+poetry add my-mimic -E redis_edition
+OR
+pip install 'my-mimic[redis_edition]'
+```
+
+You need pass the `REDIS_URL` parameter on configuration
+
+```python
+import mr
+mr.Mime.set_config(
+    config=mr.Config(
+        state=mr.states.RedisState, 
+        kwargs={"REDIS_URL": "redis://"}
+    )
+)
+```
+
 
 ### How to use
 

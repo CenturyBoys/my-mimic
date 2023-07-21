@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from freezegun import freeze_time
 
-from mr.states.implementations.memory import MemoryState
+from mr.states import MemoryState
 
 
 def test_sync_set():
