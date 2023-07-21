@@ -24,13 +24,6 @@ def test_set_config(mime_default):
     assert issubclass(Mime._config.state, StubState)
 
 
-def test_acquire_state(mime_default):
-    assert mime_default._state is None
-    state = mime_default._acquire_state()
-    assert isinstance(mime_default._state, MemoryState)
-    assert isinstance(state, MemoryState)
-
-
 def test_sync_mimic_get_cached_return(mime_default):
     @mime_default(ttl=1)
     def cached_callback(param_a: int):

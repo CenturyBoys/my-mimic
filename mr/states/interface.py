@@ -11,6 +11,10 @@ class IState(ABC):
     """
 
     @abstractmethod
+    def __init__(self, **kwargs):
+        pass
+
+    @abstractmethod
     def sync_get(self, key: str):
         """
         Sync get implementation

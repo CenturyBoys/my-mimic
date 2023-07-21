@@ -12,7 +12,8 @@ class MemoryState(IState):
     State that use hash table to save cached returns
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
         self._state = {}
 
     def sync_get(self, key: str):

@@ -10,7 +10,6 @@ import meeseeks
 
 from mr.config import Config
 from mr.states.implementations.memory import MemoryState
-from mr.states.interface import IState
 
 T = TypeVar("T")
 
@@ -25,7 +24,6 @@ class Mime:
     """
 
     _config: Config = Config(state=MemoryState)
-    _state: IState = None
 
     @classmethod
     def set_config(cls, config: Config):
@@ -40,12 +38,6 @@ class Mime:
     def __init__(self, ttl: int = None):
         self._ttl = ttl
 
-    @classmethod
-    def _acquire_state(cls) -> IState:
-        if cls._state is None:
-            cls._state = cls._config.state()
-        return cls._state
-
     @staticmethod
     def _hash_args(args: tuple, kwargs: dict) -> str:
         """
@@ -54,7 +46,7 @@ class Mime:
         hash_args = [str(arg) for arg in args]
         hash_kwargs = [f"{str(key)}{str(arg)}" for key, arg in kwargs.items()]
         hash_kwargs.sort()
-        hash_instance = hashlib.sha1(f"{hash_args}{hash_kwargs}".encode())
+        hash_instance = hashlib.sha256(f"{hash_args}{hash_kwargs}".encode())
         return hash_instance.hexdigest()
 
     def __call__(self, function: T) -> T:
@@ -64,24 +56,24 @@ class Mime:
 
             async def async_mimic(*args, **kwargs):
                 args_hash = self._hash_args(args=args, kwargs=kwargs)
-                state = self._acquire_state()
-                if cached_value := await state.async_get(key=args_hash):
-                    return cached_value
-                value = await function(*args, **kwargs)
-                await state.async_set(key=args_hash, value=value, ttl=self._ttl)
-                return value
+                async with self._config.async_acquire_state() as state:
+                    if cached_value := await state.async_get(key=args_hash):
+                        return cached_value
+                    value = await function(*args, **kwargs)
+                    await state.async_set(key=args_hash, value=value, ttl=self._ttl)
+                    return value
 
             mimic = async_mimic
         else:
 
             def sync_mimic(*args, **kwargs):
                 args_hash = self._hash_args(args=args, kwargs=kwargs)
-                state = self._acquire_state()
-                if cached_value := state.sync_get(key=args_hash):
-                    return cached_value
-                value = function(*args, **kwargs)
-                state.sync_set(key=args_hash, value=value, ttl=self._ttl)
-                return value
+                with self._config.sync_acquire_state() as state:
+                    if cached_value := state.sync_get(key=args_hash):
+                        return cached_value
+                    value = function(*args, **kwargs)
+                    state.sync_set(key=args_hash, value=value, ttl=self._ttl)
+                    return value
 
             mimic = sync_mimic
         mimic.__wrapped__ = function
