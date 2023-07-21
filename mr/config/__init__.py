@@ -28,8 +28,16 @@ class Config:
 
     @contextmanager
     def sync_acquire_state(self) -> IState:
+        """
+        Get sync state
+        :return: SyncRedis
+        """
         yield self._state
 
     @asynccontextmanager
     async def async_acquire_state(self) -> IState:
+        """
+        Get sync state
+        :return: SyncRedis
+        """
         yield self._state

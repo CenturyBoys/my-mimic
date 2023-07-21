@@ -9,7 +9,6 @@ from typing import TypeVar
 import meeseeks
 
 from mr.config import Config
-from mr.states import RedisState
 from mr.states.implementations.memory import MemoryState
 
 T = TypeVar("T")

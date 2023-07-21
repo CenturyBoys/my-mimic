@@ -21,12 +21,21 @@ class RedisState(IState):
 
     @contextmanager
     def sync_state(self) -> SyncRedis:
+        """
+        Get redis sync client
+        :return: SyncRedis
+        """
+
         if self._sync_state is None:
             self._sync_state = SyncRedis.from_url(url=self.redis_url)
         yield self._sync_state
 
     @asynccontextmanager
     async def async_state(self) -> AsyncRedis:
+        """
+        Get redis async client
+        :return: SyncRedis
+        """
         if self._async_state is None:
             self._async_state = AsyncRedis.from_url(url=self.redis_url)
         yield self._async_state
