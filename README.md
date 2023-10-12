@@ -135,6 +135,31 @@ mr.Mime.set_config(
 )
 ```
 
+#### Redis
+
+This extra add the aiofile [package](https://pypi.org/project/aiofile/) in version `^3.8.8`. All result will be `serialized` to be stored and `unserialized` to be returned using the [pickle lib](https://docs.python.org/3/library/pickle.html).
+
+How to install extra packages?
+
+```shell
+poetry add my-mimic -E temp_edition
+OR
+pip install 'my-mimic[temp_edition]'
+```
+
+You can pass the `BASE_PATH` parameter on configuration. Where all cached files will be storage, if not set will use the OS default temp folder.
+You can pass the `STATIC` parameter on configuration. When `True` disable the temporary cleanup, if used without set a `BASE_PATH` will use the OS default temp folder.
+
+
+```python
+import mr
+mr.Mime.set_config(
+    config=mr.Config(
+        state=mr.states.TempFileState, 
+        kwargs={"BASE_PATH": "/home/my_user", "STATIC": True}
+    )
+)
+```
 
 ### How to use
 
