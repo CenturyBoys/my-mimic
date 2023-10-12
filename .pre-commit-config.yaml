@@ -24,7 +24,7 @@ repos:
       language: system
       types: [ python ]
       pass_filenames: false
-      always_run: true
+      always_run: false
     - id: mutatest
       name: mutatest
       entry: mutatest
@@ -38,3 +38,4 @@ repos:
           "mr",
         ]
       pass_filenames: false
+      always_run: false
