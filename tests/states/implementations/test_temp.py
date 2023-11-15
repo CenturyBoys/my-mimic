@@ -1,6 +1,7 @@
 import builtins
 import os
 import tempfile
+from inspect import _empty
 from pathlib import Path
 from random import randint
 from tempfile import TemporaryDirectory
@@ -42,7 +43,7 @@ def test_sync_set():
     with freeze_time("2023-01-14 12:00:01"):
         mock_object = MagicMock()
         with patch.object(builtins, "open", return_value=mock_object):
-            state.sync_set("t1", 10, 1)
+            state.sync_set(1, 10, 1)
     write_bytes_call = call.write(
         b"\x80\x04\x953\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\ncreated_at\x94GA\xd8\xf0\xa6P@\x00\x00\x8c\x03ttl\x94K\x01\x8c\x05value\x94C\x05\x80\x04K\n.\x94u.",
     )
@@ -54,7 +55,7 @@ async def test_async_set():
     state = TempFileState()
     with freeze_time("2023-01-14 12:00:01"):
         with patch("aiofile.async_open") as mock_object:
-            await state.async_set("t1", 10, 1)
+            await state.async_set(1, 10, 1)
     write_bytes_call = call.write(
         b"\x80\x04\x953\x00\x00\x00\x00\x00\x00\x00}\x94(\x8c\ncreated_at\x94GA\xd8\xf0\xa6P@\x00\x00\x8c\x03ttl\x94K\x01\x8c\x05value\x94C\x05\x80\x04K\n.\x94u.",
     )
@@ -66,22 +67,25 @@ async def test_async_set():
 def state_with_data():
     state = TempFileState()
     with freeze_time("2023-01-14 12:00:00"):
-        data = [str(uuid4()), randint(1, 10), randint(1, 10)]
+        data = [1, randint(1, 10), randint(1, 10)]
         state.sync_set(*data)
     return state, data
 
 
 def test_sync_get_without_data(state_with_data):
     state, data = state_with_data
-    value = state.sync_get("t1")
+    value = state.sync_get(1)
     assert value is None
 
 
-def test_sync_get_expired_ttl(state_with_data):
-    state, data = state_with_data
-    with freeze_time("2023-01-14 13:00:00"):
-        value = state.sync_get("t1")
-    assert value is None
+def test_sync_get_expired_ttl():
+    state = TempFileState()
+    with freeze_time("2023-01-14 12:00:00"):
+        data = [1, randint(1, 10), 1]
+        state.sync_set(*data)
+    with freeze_time("2023-01-14 12:00:01"):
+        value = state.sync_get(key=1)
+    assert value == data[1]
 
 
 def test_sync_get(state_with_data):
@@ -91,9 +95,22 @@ def test_sync_get(state_with_data):
     assert value == data[1]
 
 
+def test_sync_get_without_set():
+    state = TempFileState()
+    value = state.sync_get(1)
+    assert value is None
+
+
+@pytest.mark.asyncio
+async def test_async_get_without_set():
+    state = TempFileState()
+    value = await state.async_get(1)
+    assert value is None
+
+
 def test_sync_get_without_ttl_set(state_with_data):
     state = TempFileState()
-    data = [str(uuid4()), randint(1, 10), None]
+    data = [1, randint(1, 10), _empty]
     state.sync_set(*data)
     value = state.sync_get(data[0])
     assert value == data[1]
@@ -102,7 +119,7 @@ def test_sync_get_without_ttl_set(state_with_data):
 @pytest.mark.asyncio
 async def test_async_get_without_data(state_with_data):
     state, data = state_with_data
-    value = await state.async_get("t1")
+    value = await state.async_get(1)
     assert value is None
 
 
@@ -110,7 +127,7 @@ async def test_async_get_without_data(state_with_data):
 async def test_async_get_expired_ttl(state_with_data):
     state, data = state_with_data
     with freeze_time("2023-01-14 13:00:00"):
-        value = await state.async_get("t1")
+        value = await state.async_get(1)
     assert value is None
 
 
@@ -125,7 +142,7 @@ async def test_async_get(state_with_data):
 @pytest.mark.asyncio
 async def test_async_get_without_ttl_set(state_with_data):
     state = TempFileState()
-    data = [str(uuid4()), randint(1, 10), None]
+    data = [1, randint(1, 10), _empty]
     await state.async_set(*data)
     value = await state.async_get(data[0])
     assert value == data[1]

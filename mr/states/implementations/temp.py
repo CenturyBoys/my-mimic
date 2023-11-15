@@ -4,6 +4,7 @@ Memory state implementation
 import pickle
 import tempfile
 from datetime import datetime
+from inspect import _empty
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional
@@ -38,15 +39,15 @@ class TempFileState(IState):
                 "The config value BASE_PATH is not a valid Path"
             ) from exception
 
-    def get_path(self, key: str) -> Path:
+    def get_path(self, key: int) -> Path:
         """
         Get temp file path
         :return: Path
         """
-        temp_path = self._path / key
+        temp_path = self._path / str(key)
         return temp_path
 
-    def sync_get(self, key: str):
+    def sync_get(self, key: int):
         path = self.get_path(key=key)
         if path.exists():
             with open(path, "rb") as file:
@@ -54,12 +55,12 @@ class TempFileState(IState):
             return self.__unpickle_with_header(value)
         return None
 
-    def sync_set(self, key: str, value: any, ttl: int = None):
+    def sync_set(self, key: int, value: any, ttl: int = _empty):
         path = self.get_path(key=key)
         with open(path, "wb") as file:
             file.write(self.__pickle_with_header(value, ttl))
 
-    async def async_get(self, key: str):
+    async def async_get(self, key: int):
         path = self.get_path(key=key)
         if path.exists():
             async with aiofile.async_open(path, "rb") as file:
@@ -67,13 +68,13 @@ class TempFileState(IState):
             return self.__unpickle_with_header(value)
         return None
 
-    async def async_set(self, key: str, value: any, ttl: int = None):
+    async def async_set(self, key: int, value: any, ttl: int = _empty):
         path = self.get_path(key=key)
         async with aiofile.async_open(path, "wb") as file:
             await file.write(self.__pickle_with_header(value, ttl))
 
     @staticmethod
-    def __pickle_with_header(value: any, ttl: int = None) -> bytes:
+    def __pickle_with_header(value: any, ttl: int = _empty) -> bytes:
         pack = {
             "created_at": datetime.utcnow().timestamp(),
             "ttl": ttl,
@@ -86,7 +87,7 @@ class TempFileState(IState):
         now_timestamp = datetime.utcnow().timestamp()
         pack = pickle.loads(pack_bytes)
         register_timestamp = pack.get("created_at")
-        ttl = pack.get("ttl")
-        if ttl is None or ((register_timestamp + ttl) >= now_timestamp):
+        _ttl = pack.get("ttl")
+        if _ttl == _empty or ((register_timestamp + _ttl) >= now_timestamp):
             return pickle.loads(pack.get("value"))
         return None

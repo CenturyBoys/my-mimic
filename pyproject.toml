@@ -7,9 +7,7 @@ license = "Apache License 2.0"
 readme = "README.md"
 packages = [
     { include = "mr"},
-    { include = "mr/**/*.py" },
 ]
-
 
 [tool.poetry.dependencies]
 python = "^3.10"
