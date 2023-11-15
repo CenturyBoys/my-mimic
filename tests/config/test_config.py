@@ -1,3 +1,5 @@
+import dataclasses
+
 import pytest
 
 from mr import Config, IState
@@ -16,22 +18,34 @@ class StubState(IState):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
-    def sync_get(self, key: str):
+    def sync_get(self, key: int):
         pass
 
-    def sync_set(self, key: str, value: any, ttl: int = None):
+    def sync_set(self, key: int, value: any, ttl: int = None):
         pass
 
-    async def async_get(self, key: str):
+    async def async_get(self, key: int):
         pass
 
-    async def async_set(self, key: str, value: any, ttl: int = None):
+    async def async_set(self, key: int, value: any, ttl: int = None):
         pass
+
+
+def test_slots():
+    config = Config(state=StubState, state_kwargs={"key": "value"})
+    assert config.__slots__ == ("state", "state_kwargs", "_state")
+
+
+def test_frozen():
+    config = Config(state=StubState, state_kwargs={"key": "value"})
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        config.state_kwargs = {}
 
 
 def test_config():
     kwargs = {"key": "value"}
-    config = Config(state=StubState, kwargs=kwargs)
+    config = Config(state=StubState, state_kwargs=kwargs)
     assert issubclass(config.state, StubState)
-    assert isinstance(config._state, StubState)
-    assert config.kwargs == kwargs
+    assert config._state is None
+    assert isinstance(config.initialized_state, StubState)
+    assert config.state_kwargs == kwargs

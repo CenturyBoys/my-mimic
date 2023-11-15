@@ -15,36 +15,36 @@ class IState(ABC):
         pass
 
     @abstractmethod
-    def sync_get(self, key: str):
+    def sync_get(self, key: int):
         """
         Sync get implementation
-        :param key: Str
+        :param key: int
         :return:
         """
 
     @abstractmethod
-    def sync_set(self, key: str, value: any, ttl: int = None):
+    def sync_set(self, key: int, value: any, ttl: int):
         """
         Sync set implementation
-        :param key: Str
+        :param key: int
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
         """
 
     @abstractmethod
-    async def async_get(self, key: str):
+    async def async_get(self, key: int):
         """
         Async get implementation
-        :param key: Str
+        :param key: int
         :return:
         """
 
     @abstractmethod
-    async def async_set(self, key: str, value: any, ttl: int = None):
+    async def async_set(self, key: int, value: any, ttl: int):
         """
         Async set implementation
-        :param key: Str
+        :param key: int
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
