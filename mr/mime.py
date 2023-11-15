@@ -1,9 +1,10 @@
 """
 Mr Mime is a function decorator for cache/memoization
 """
-
-import hashlib
+import functools
 import inspect
+import itertools
+from inspect import _empty
 from typing import TypeVar
 
 import meeseeks
@@ -12,7 +13,6 @@ from mr.config import Config
 from mr.states.implementations.memory import MemoryState
 
 T = TypeVar("T")
-
 
 singleton_container = meeseeks.OnlyOne(by_args_hash=True)
 
@@ -35,46 +35,51 @@ class Mime:
         """
         cls._config = config
 
-    def __init__(self, ttl: int = None):
+    def __init__(self, ttl: int = _empty):
         self._ttl = ttl
 
     @staticmethod
-    def _hash_args(args: tuple, kwargs: dict) -> str:
+    def _hash_args(func_hash: int, args: tuple, kwargs: dict) -> int:
         """
         Created for each arg + kwargs hash. The kwargs`s order doesn't have influence
         """
-        hash_args = [str(arg) for arg in args]
-        hash_kwargs = [f"{str(key)}{str(arg)}" for key, arg in kwargs.items()]
-        hash_kwargs.sort()
-        hash_instance = hashlib.sha256(f"{hash_args}{hash_kwargs}".encode())
-        return hash_instance.hexdigest()
+        hash_instance = tuple(
+            item for item in itertools.chain([func_hash], args, kwargs.items())
+        )
+        return hash(hash_instance)
 
-    def __call__(self, function: T) -> T:
-        is_async = inspect.iscoroutinefunction(function)
+    def __call__(self, callable_obj: T) -> T:
+        _is_class = inspect.isclass(callable_obj)
+        if inspect.isclass(callable_obj):
+            raise TypeError(
+                "Mr. Mime don`t support class memoization for this use meeseeks-singleton package\n"
+                "link: https://pypi.org/project/meeseeks-singleton/"
+            )
+        _func_hash = hash(callable_obj)
+        if inspect.iscoroutinefunction(callable_obj):
 
-        if is_async:
-
+            @functools.wraps(callable_obj)
             async def async_mimic(*args, **kwargs):
-                args_hash = self._hash_args(args=args, kwargs=kwargs)
+                args_hash = self._hash_args(
+                    func_hash=_func_hash, args=args, kwargs=kwargs
+                )
                 async with self._config.async_acquire_state() as state:
                     if cached_value := await state.async_get(key=args_hash):
                         return cached_value
-                    value = await function(*args, **kwargs)
+                    value = await callable_obj(*args, **kwargs)
                     await state.async_set(key=args_hash, value=value, ttl=self._ttl)
                     return value
 
-            mimic = async_mimic
-        else:
+            return async_mimic
 
-            def sync_mimic(*args, **kwargs):
-                args_hash = self._hash_args(args=args, kwargs=kwargs)
-                with self._config.sync_acquire_state() as state:
-                    if cached_value := state.sync_get(key=args_hash):
-                        return cached_value
-                    value = function(*args, **kwargs)
-                    state.sync_set(key=args_hash, value=value, ttl=self._ttl)
-                    return value
+        @functools.wraps(callable_obj)
+        def sync_mimic(*args, **kwargs):
+            args_hash = self._hash_args(func_hash=_func_hash, args=args, kwargs=kwargs)
+            with self._config.sync_acquire_state() as state:
+                if cached_value := state.sync_get(key=args_hash):
+                    return cached_value
+                value = callable_obj(*args, **kwargs)
+                state.sync_set(key=args_hash, value=value, ttl=self._ttl)
+                return value
 
-            mimic = sync_mimic
-        mimic.__wrapped__ = function
-        return mimic
+        return sync_mimic

@@ -49,36 +49,36 @@ class IState(ABC):
     """
 
     @abstractmethod
-    def sync_get(self, key: str):
+    def sync_get(self, key: int):
         """
         Sync get implementation
-        :param key: Str
+        :param key: int
         :return:
         """
 
     @abstractmethod
-    def sync_set(self, key: str, value: any, ttl: int = None):
+    def sync_set(self, key: int, value: any, ttl: int = None):
         """
         Sync set implementation
-        :param key: Str
+        :param key: int
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
         """
 
     @abstractmethod
-    async def async_get(self, key: str):
+    async def async_get(self, key: int):
         """
         Async get implementation
-        :param key: Str
+        :param key: int
         :return:
         """
 
     @abstractmethod
-    async def async_set(self, key: str, value: any, ttl: int = None):
+    async def async_set(self, key: int, value: any, ttl: int = None):
         """
         Async set implementation
-        :param key: Str
+        :param key: int
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
@@ -86,25 +86,27 @@ class IState(ABC):
 
 ```
 
-To configure a new state you need to use `mr.Mime.set_config` function passing a config instance. The config accepts a `kwargs: dict` parameter, this parameter will be sent to the state instance. 
+To configure a new state you need to use `mr.Mime.set_config` function passing a config instance. The config accepts a `kwargs: dict` parameter, this parameter will be sent to the state instance.
 
 ```python
 import mr
 
+
 class MyState(mr.IState):
-    def sync_get(self, key: str):
+    def sync_get(self, key: int):
         pass
 
-    def sync_set(self, key: str, value: any, ttl: int = None):
+    def sync_set(self, key: int, value: any, ttl: int = None):
         pass
 
-    async def async_get(self, key: str):
+    async def async_get(self, key: int):
         pass
 
-    async def async_set(self, key: str, value: any, ttl: int = None):
+    async def async_set(self, key: int, value: any, ttl: int = None):
         pass
 
-mr.Mime.set_config(config=mr.Config(state=MyState, kwargs={"KEY": "value"}))
+
+mr.Mime.set_config(config=mr.Config(state=MyState, state_kwargs={"KEY": "value"}))
 ```
 
 ### Extras
@@ -127,14 +129,40 @@ You need pass the `REDIS_URL` parameter on configuration
 
 ```python
 import mr
+
 mr.Mime.set_config(
     config=mr.Config(
-        state=mr.states.RedisState, 
-        kwargs={"REDIS_URL": "redis://"}
+        state=mr.states.RedisState,
+        state_kwargs={"REDIS_URL": "redis://"}
     )
 )
 ```
 
+#### Redis
+
+This extra add the aiofile [package](https://pypi.org/project/aiofile/) in version `^3.8.8`. All result will be `serialized` to be stored and `unserialized` to be returned using the [pickle lib](https://docs.python.org/3/library/pickle.html).
+
+How to install extra packages?
+
+```shell
+poetry add my-mimic -E temp_edition
+OR
+pip install 'my-mimic[temp_edition]'
+```
+
+You can pass the `BASE_PATH` parameter on configuration. Where all cached files will be storage, if not set will use the OS default temp folder.
+You can pass the `STATIC` parameter on configuration. When `True` disable the temporary cleanup, if used without set a `BASE_PATH` will use the OS default temp folder.
+
+
+```python
+import mr
+mr.Mime.set_config(
+    config=mr.Config(
+        state=mr.states.TempFileState, 
+        kwargs={"BASE_PATH": "/home/my_user", "STATIC": True}
+    )
+)
+```
 
 ### How to use
 

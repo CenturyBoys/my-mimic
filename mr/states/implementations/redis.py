@@ -3,6 +3,7 @@ Memory state implementation
 """
 import pickle
 from contextlib import contextmanager, asynccontextmanager
+from inspect import _empty
 
 from redis.asyncio.client import Redis as AsyncRedis
 from redis.client import Redis as SyncRedis
@@ -16,29 +17,29 @@ class RedisState(IState):
     State that use hash table to save cached returns
     """
 
-    _async_state: AsyncRedis = None
-    _sync_state: SyncRedis = None
+    __async_state: AsyncRedis = _empty
+    __sync_state: SyncRedis = _empty
 
     @contextmanager
-    def sync_state(self) -> SyncRedis:
+    def _sync_state(self) -> SyncRedis:
         """
         Get redis sync client
         :return: SyncRedis
         """
 
-        if self._sync_state is None:
-            self._sync_state = SyncRedis.from_url(url=self.redis_url)
-        yield self._sync_state
+        if self.__sync_state == _empty:
+            self.__sync_state = SyncRedis.from_url(url=self.redis_url)
+        yield self.__sync_state
 
     @asynccontextmanager
-    async def async_state(self) -> AsyncRedis:
+    async def _async_state(self) -> AsyncRedis:
         """
         Get redis async client
         :return: SyncRedis
         """
-        if self._async_state is None:
-            self._async_state = AsyncRedis.from_url(url=self.redis_url)
-        yield self._async_state
+        if self.__async_state == _empty:
+            self.__async_state = AsyncRedis.from_url(url=self.redis_url)
+        yield self.__async_state
 
     def __init__(self, **kwargs):
         try:
@@ -46,22 +47,22 @@ class RedisState(IState):
         except KeyError as exception:
             raise KeyError("The config value REDIS_URL was not informed") from exception
 
-    def sync_get(self, key: str):
-        with self.sync_state() as state:
+    def sync_get(self, key: int):
+        with self._sync_state() as state:
             if value := state.get(key):
                 return pickle.loads(value)
         return None
 
-    def sync_set(self, key: str, value: any, ttl: int = None):
-        with self.sync_state() as state:
+    def sync_set(self, key: int, value: any, ttl: int = _empty):
+        with self._sync_state() as state:
             state.set(key, pickle.dumps(value), ex=ttl, nx=True)
 
-    async def async_get(self, key: str):
-        async with self.async_state() as state:
+    async def async_get(self, key: int):
+        async with self._async_state() as state:
             if value := await state.get(key):
                 return pickle.loads(value)
         return None
 
-    async def async_set(self, key: str, value: any, ttl: int = None):
-        async with self.async_state() as state:
+    async def async_set(self, key: int, value: any, ttl: int = _empty):
+        async with self._async_state() as state:
             await state.set(key, pickle.dumps(value), ex=ttl, nx=True)
