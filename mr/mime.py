@@ -5,7 +5,7 @@ import functools
 import inspect
 import itertools
 from inspect import _empty
-from typing import TypeVar
+from typing import TypeVar, Hashable
 
 import meeseeks
 
@@ -44,7 +44,10 @@ class Mime:
         Created for each arg + kwargs hash. The kwargs`s order doesn't have influence
         """
         hash_instance = tuple(
-            item for item in itertools.chain([func_hash], args, kwargs.items())
+            item if isinstance(item, Hashable) else str(item)
+            for item in itertools.chain(
+                [func_hash], args, [i[1] for i in sorted(kwargs.items())]
+            )
         )
         return hash(hash_instance)
 
