@@ -17,8 +17,8 @@ class RedisState(IState):
     State that use hash table to save cached returns
     """
 
-    __async_state: AsyncRedis = _empty
-    __sync_state: SyncRedis = _empty
+    __async_state: AsyncRedis = None
+    __sync_state: SyncRedis = None
 
     @contextmanager
     def _sync_state(self) -> SyncRedis:
@@ -27,7 +27,7 @@ class RedisState(IState):
         :return: SyncRedis
         """
 
-        if self.__sync_state == _empty:
+        if self.__sync_state is None:
             self.__sync_state = SyncRedis.from_url(url=self.redis_url)
         yield self.__sync_state
 
@@ -37,7 +37,7 @@ class RedisState(IState):
         Get redis async client
         :return: SyncRedis
         """
-        if self.__async_state == _empty:
+        if self.__async_state is None:
             self.__async_state = AsyncRedis.from_url(url=self.redis_url)
         yield self.__async_state
 
