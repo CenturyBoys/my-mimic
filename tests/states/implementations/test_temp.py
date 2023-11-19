@@ -6,7 +6,6 @@ from pathlib import Path
 from random import randint
 from tempfile import TemporaryDirectory
 from unittest.mock import patch, MagicMock, call
-from uuid import uuid4
 
 import pytest
 from freezegun import freeze_time

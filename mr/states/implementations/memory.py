@@ -21,7 +21,7 @@ class MemoryState(IState):
         self._kwargs = kwargs
         self._state = {}
 
-    def sync_get(self, key: int):
+    def sync_get(self, key: str):
         now_timestamp = datetime.utcnow().timestamp()
         if register := self._state.get(key):
             _ttl = register.get("ttl")
@@ -29,7 +29,7 @@ class MemoryState(IState):
                 return register.get("value")
         return None
 
-    def sync_set(self, key: int, value: any, ttl: int = _empty):
+    def sync_set(self, key: str, value: any, ttl: int = _empty):
         value = {
             "created_at": datetime.utcnow().timestamp(),
             "ttl": ttl,
@@ -37,8 +37,8 @@ class MemoryState(IState):
         }
         self._state.update({key: value})
 
-    async def async_get(self, key: int):
+    async def async_get(self, key: str):
         return self.sync_get(key)
 
-    async def async_set(self, key: int, value: any, ttl: int = _empty):
+    async def async_set(self, key: str, value: any, ttl: int = _empty):
         return self.sync_set(key=key, value=value, ttl=ttl)
