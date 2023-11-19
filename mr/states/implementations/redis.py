@@ -47,22 +47,22 @@ class RedisState(IState):
         except KeyError as exception:
             raise KeyError("The config value REDIS_URL was not informed") from exception
 
-    def sync_get(self, key: int):
+    def sync_get(self, key: str):
         with self._sync_state() as state:
             if value := state.get(key):
                 return pickle.loads(value)
         return None
 
-    def sync_set(self, key: int, value: any, ttl: int = _empty):
+    def sync_set(self, key: str, value: any, ttl: int = _empty):
         with self._sync_state() as state:
             state.set(key, pickle.dumps(value), ex=ttl, nx=True)
 
-    async def async_get(self, key: int):
+    async def async_get(self, key: str):
         async with self._async_state() as state:
             if value := await state.get(key):
                 return pickle.loads(value)
         return None
 
-    async def async_set(self, key: int, value: any, ttl: int = _empty):
+    async def async_set(self, key: str, value: any, ttl: int = _empty):
         async with self._async_state() as state:
             await state.set(key, pickle.dumps(value), ex=ttl, nx=True)
