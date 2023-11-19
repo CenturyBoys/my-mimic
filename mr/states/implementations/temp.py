@@ -39,7 +39,7 @@ class TempFileState(IState):
                 "The config value BASE_PATH is not a valid Path"
             ) from exception
 
-    def get_path(self, key: int) -> Path:
+    def get_path(self, key: str) -> Path:
         """
         Get temp file path
         :return: Path
@@ -47,7 +47,7 @@ class TempFileState(IState):
         temp_path = self._path / str(key)
         return temp_path
 
-    def sync_get(self, key: int):
+    def sync_get(self, key: str):
         path = self.get_path(key=key)
         if path.exists():
             with open(path, "rb") as file:
@@ -55,12 +55,12 @@ class TempFileState(IState):
             return self.__unpickle_with_header(value)
         return None
 
-    def sync_set(self, key: int, value: any, ttl: int = _empty):
+    def sync_set(self, key: str, value: any, ttl: int = _empty):
         path = self.get_path(key=key)
         with open(path, "wb") as file:
             file.write(self.__pickle_with_header(value, ttl))
 
-    async def async_get(self, key: int):
+    async def async_get(self, key: str):
         path = self.get_path(key=key)
         if path.exists():
             async with aiofile.async_open(path, "rb") as file:
@@ -68,7 +68,7 @@ class TempFileState(IState):
             return self.__unpickle_with_header(value)
         return None
 
-    async def async_set(self, key: int, value: any, ttl: int = _empty):
+    async def async_set(self, key: str, value: any, ttl: int = _empty):
         path = self.get_path(key=key)
         async with aiofile.async_open(path, "wb") as file:
             await file.write(self.__pickle_with_header(value, ttl))

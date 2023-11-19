@@ -2,10 +2,11 @@
 Mr Mime is a function decorator for cache/memoization
 """
 import functools
+import hashlib
 import inspect
 import itertools
 from inspect import _empty
-from typing import TypeVar, Hashable
+from typing import TypeVar
 
 import meeseeks
 
@@ -39,17 +40,17 @@ class Mime:
         self._ttl = ttl
 
     @staticmethod
-    def _hash_args(func_hash: int, args: tuple, kwargs: dict) -> int:
+    def _hash_args(func_name: str, args: tuple, kwargs: dict) -> str:
         """
         Created for each arg + kwargs hash. The kwargs`s order doesn't have influence
         """
-        hash_instance = tuple(
-            item if isinstance(item, Hashable) else str(item)
+        hash_instance = "".join(
+            str(item)
             for item in itertools.chain(
-                [func_hash], args, [i[1] for i in sorted(kwargs.items())]
+                [func_name], args, [i[1] for i in sorted(kwargs.items())]
             )
         )
-        return hash(hash_instance)
+        return hashlib.sha256(hash_instance.encode()).hexdigest()
 
     def __call__(self, callable_obj: T) -> T:
         _is_class = inspect.isclass(callable_obj)
@@ -58,13 +59,12 @@ class Mime:
                 "Mr. Mime don`t support class memoization for this use meeseeks-singleton package\n"
                 "link: https://pypi.org/project/meeseeks-singleton/"
             )
-        _func_hash = hash(callable_obj)
         if inspect.iscoroutinefunction(callable_obj):
 
             @functools.wraps(callable_obj)
             async def async_mimic(*args, **kwargs):
                 args_hash = self._hash_args(
-                    func_hash=_func_hash, args=args, kwargs=kwargs
+                    func_name=callable_obj.__name__, args=args, kwargs=kwargs
                 )
                 async with self._config.async_acquire_state() as state:
                     if cached_value := await state.async_get(key=args_hash):
@@ -77,7 +77,9 @@ class Mime:
 
         @functools.wraps(callable_obj)
         def sync_mimic(*args, **kwargs):
-            args_hash = self._hash_args(func_hash=_func_hash, args=args, kwargs=kwargs)
+            args_hash = self._hash_args(
+                func_name=callable_obj.__name__, args=args, kwargs=kwargs
+            )
             with self._config.sync_acquire_state() as state:
                 if cached_value := state.sync_get(key=args_hash):
                     return cached_value

@@ -49,36 +49,36 @@ class IState(ABC):
     """
 
     @abstractmethod
-    def sync_get(self, key: int):
+    def sync_get(self, key: str):
         """
         Sync get implementation
-        :param key: int
+        :param key: str
         :return:
         """
 
     @abstractmethod
-    def sync_set(self, key: int, value: any, ttl: int = None):
+    def sync_set(self, key: str, value: any, ttl: int = None):
         """
         Sync set implementation
-        :param key: int
+        :param key: str
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
         """
 
     @abstractmethod
-    async def async_get(self, key: int):
+    async def async_get(self, key: str):
         """
         Async get implementation
-        :param key: int
+        :param key: str
         :return:
         """
 
     @abstractmethod
-    async def async_set(self, key: int, value: any, ttl: int = None):
+    async def async_set(self, key: str, value: any, ttl: int = None):
         """
         Async set implementation
-        :param key: int
+        :param key: str
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
@@ -93,16 +93,16 @@ import mr
 
 
 class MyState(mr.IState):
-    def sync_get(self, key: int):
+    def sync_get(self, key: str):
         pass
 
-    def sync_set(self, key: int, value: any, ttl: int = None):
+    def sync_set(self, key: str, value: any, ttl: int = None):
         pass
 
-    async def async_get(self, key: int):
+    async def async_get(self, key: str):
         pass
 
-    async def async_set(self, key: int, value: any, ttl: int = None):
+    async def async_set(self, key: str, value: any, ttl: int = None):
         pass
 
 

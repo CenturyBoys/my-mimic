@@ -18,16 +18,16 @@ class StubState(IState):
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
-    def sync_get(self, key: int):
+    def sync_get(self, key: str):
         pass
 
-    def sync_set(self, key: int, value: any, ttl: int = None):
+    def sync_set(self, key: str, value: any, ttl: int = None):
         pass
 
-    async def async_get(self, key: int):
+    async def async_get(self, key: str):
         pass
 
-    async def async_set(self, key: int, value: any, ttl: int = None):
+    async def async_set(self, key: str, value: any, ttl: int = None):
         pass
 
 

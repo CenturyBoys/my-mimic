@@ -291,13 +291,13 @@ python-dateutil = ">=2.7"
 
 [[package]]
 name = "identify"
-version = "2.5.31"
+version = "2.5.32"
 description = "File identification library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "identify-2.5.31-py2.py3-none-any.whl", hash = "sha256:90199cb9e7bd3c5407a9b7e81b4abec4bb9d249991c79439ec8af740afc6293d"},
-    {file = "identify-2.5.31.tar.gz", hash = "sha256:7736b3c7a28233637e3c36550646fc6389bedd74ae84cb788200cc8e2dd60b75"},
+    {file = "identify-2.5.32-py2.py3-none-any.whl", hash = "sha256:0b7656ef6cba81664b783352c73f8c24b39cf82f926f78f4550eda928e5e0545"},
+    {file = "identify-2.5.32.tar.gz", hash = "sha256:5d9979348ec1a21c768ae07e0a652924538e8bce67313a73cb0f681cf08ba407"},
 ]
 
 [package.extras]
@@ -389,13 +389,13 @@ files = [
 
 [[package]]
 name = "meeseeks-singleton"
-version = "0.4.3"
+version = "0.4.4"
 description = "A Singleton python project"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "meeseeks_singleton-0.4.3-py3-none-any.whl", hash = "sha256:d28c796adec2d5888bdd88a240e772755117a9a19bee3b49a8927bcd037131d4"},
-    {file = "meeseeks_singleton-0.4.3.tar.gz", hash = "sha256:cd271f20b76bf52e8286e011dbe35a12baf90e2b79dcd2e725889ea3f8fb3501"},
+    {file = "meeseeks_singleton-0.4.4-py3-none-any.whl", hash = "sha256:e1ade489e9b9a76e9cc8a1e958d6749694bf35a71a0a273099b05c8579b301d4"},
+    {file = "meeseeks_singleton-0.4.4.tar.gz", hash = "sha256:d4683360f419abb22f4be1cbd1ae8a282e07304ee1ed61a85c844faf155153c6"},
 ]
 
 [[package]]
