@@ -1,7 +1,7 @@
 """
 Memory state implementation
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from inspect import _empty
 
 from mr.states.interface import IState
@@ -31,7 +31,7 @@ class MemoryState(IState):
 
     def sync_set(self, key: str, value: any, ttl: int = _empty):
         value = {
-            "created_at": datetime.utcnow().timestamp(),
+            "created_at": datetime.now(timezone.utc),
             "ttl": ttl,
             "value": value,
         }
