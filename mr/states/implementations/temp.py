@@ -84,7 +84,7 @@ class TempFileState(IState):
 
     @staticmethod
     def __unpickle_with_header(pack_bytes: bytes) -> Optional[any]:
-        now_timestamp = datetime.utcnow().timestamp()
+        datetime.now(timezone.utc).timestamp()
         pack = pickle.loads(pack_bytes)
         register_timestamp = pack.get("created_at")
         _ttl = pack.get("ttl")
