@@ -31,7 +31,7 @@ class MemoryState(IState):
 
     def sync_set(self, key: str, value: any, ttl: int = _empty):
         value = {
-            "created_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(timezone.utc).timestamp(),
             "ttl": ttl,
             "value": value,
         }
