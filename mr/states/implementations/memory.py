@@ -22,7 +22,7 @@ class MemoryState(IState):
         self._state = {}
 
     def sync_get(self, key: str):
-        datetime.now(timezone.utc).timestamp()
+        now_timestamp = datetime.now(timezone.utc).timestamp()
         if register := self._state.get(key):
             _ttl = register.get("ttl")
             if _ttl == _empty or ((register.get("created_at") + _ttl) >= now_timestamp):
