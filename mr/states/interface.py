@@ -23,6 +23,14 @@ class IState(ABC):
         """
 
     @abstractmethod
+    def sync_unset(self, key: str):
+        """
+        Sync unset implementation
+        :param key: str
+        :return:
+        """
+
+    @abstractmethod
     def sync_set(self, key: str, value: any, ttl: int):
         """
         Sync set implementation
@@ -47,5 +55,13 @@ class IState(ABC):
         :param key: str
         :param value: Any
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
+        :return:
+        """
+
+    @abstractmethod
+    async def async_unset(self, key: str):
+        """
+        Async unset implementation
+        :param key: str
         :return:
         """

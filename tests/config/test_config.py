@@ -24,10 +24,16 @@ class StubState(IState):
     def sync_set(self, key: str, value: any, ttl: int = None):
         pass
 
+    def sync_unset(self, key: str):
+        pass
+
     async def async_get(self, key: str):
         pass
 
     async def async_set(self, key: str, value: any, ttl: int = None):
+        pass
+
+    async def async_unset(self, key: str):
         pass
 
 

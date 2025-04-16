@@ -145,3 +145,37 @@ async def test_async_get_without_ttl_set(state_with_data):
     await state.async_set(*data)
     value = await state.async_get(data[0])
     assert value == data[1]
+
+
+def test_sync_unset(state_with_data):
+    state, data = state_with_data
+    _key = "key_1"
+    state.sync_set(_key, 10, 1)
+    assert 10 == state.sync_get(_key)
+    state.sync_unset(_key)
+    assert state.sync_get(_key) is None
+
+
+def test_sync_unset_without_set(state_with_data):
+    state, data = state_with_data
+    _key = "key_1"
+    state.sync_unset(_key)
+    assert state.sync_get(_key) is None
+
+
+@pytest.mark.asyncio
+async def test_async_unset(state_with_data):
+    state, data = state_with_data
+    _key = "key_1"
+    await state.async_set(_key, 10, 1)
+    assert 10 == await state.async_get(_key)
+    await state.async_unset(_key)
+    assert await state.async_get(_key) is None
+
+
+@pytest.mark.asyncio
+async def test_async_unset_without_set(state_with_data):
+    state, data = state_with_data
+    _key = "key_1"
+    await state.async_unset(_key)
+    assert await state.async_get(_key) is None

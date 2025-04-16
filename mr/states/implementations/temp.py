@@ -2,6 +2,7 @@
 Memory state implementation
 """
 
+import os
 import pickle
 import tempfile
 from datetime import datetime, timezone
@@ -56,6 +57,12 @@ class TempFileState(IState):
             return self.__unpickle_with_header(value)
         return None
 
+    def sync_unset(self, key: str):
+        path = self.get_path(key=key)
+        if path.exists():
+            os.remove(path)
+        return None
+
     def sync_set(self, key: str, value: any, ttl: int = _empty):
         path = self.get_path(key=key)
         with open(path, "wb") as file:
@@ -73,6 +80,10 @@ class TempFileState(IState):
         path = self.get_path(key=key)
         async with aiofile.async_open(path, "wb") as file:
             await file.write(self.__pickle_with_header(value, ttl))
+
+    async def async_unset(self, key: str):
+        self.sync_unset(key)
+        return None
 
     @staticmethod
     def __pickle_with_header(value: any, ttl: int = _empty) -> bytes:

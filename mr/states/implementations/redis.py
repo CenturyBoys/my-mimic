@@ -1,6 +1,7 @@
 """
 Memory state implementation
 """
+
 import pickle
 from contextlib import contextmanager, asynccontextmanager
 from inspect import _empty
@@ -57,6 +58,10 @@ class RedisState(IState):
         with self._sync_state() as state:
             state.set(key, pickle.dumps(value), ex=ttl, nx=True)
 
+    def sync_unset(self, key: str):
+        with self._sync_state() as state:
+            state.delete(key)
+
     async def async_get(self, key: str):
         async with self._async_state() as state:
             if value := await state.get(key):
@@ -66,3 +71,7 @@ class RedisState(IState):
     async def async_set(self, key: str, value: any, ttl: int = _empty):
         async with self._async_state() as state:
             await state.set(key, pickle.dumps(value), ex=ttl, nx=True)
+
+    async def async_unset(self, key: str):
+        async with self._async_state() as state:
+            await state.delete(key)

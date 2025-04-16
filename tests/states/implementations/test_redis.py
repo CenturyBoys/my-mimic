@@ -108,3 +108,20 @@ async def test_async_get():
         value = await state.async_get(1)
     assert value == 1
     mock_object.get.assert_called_once()
+
+
+def test_sync_state_unset():
+    state = RedisState(REDIS_URL="redis://")
+    mock_object = MagicMock()
+    with patch.object(SyncRedis, "from_url", return_value=mock_object):
+        state.sync_unset(1)
+    assert mock_object.delete.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_async_state_unset():
+    state = RedisState(REDIS_URL="redis://")
+    mock_object = AsyncMock()
+    with patch.object(AsyncRedis, "from_url", return_value=mock_object):
+        await state.async_unset(1)
+    assert mock_object.delete.call_count == 1

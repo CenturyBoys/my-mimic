@@ -1,6 +1,5 @@
 from inspect import _empty
 from random import randint
-from uuid import uuid4
 
 import pytest
 from freezegun import freeze_time
@@ -93,3 +92,37 @@ async def test_async_get_without_ttl_set(state_with_data):
     await state.async_set(*data)
     value = await state.async_get(data[0])
     assert value == data[1]
+
+
+def test_sync_unset_with_data():
+    state = MemoryState()
+    with freeze_time("2023-01-14 12:00:01"):
+        state.sync_set(1, 10, 1)
+    assert state._state == {1: {"created_at": 1673697601.0, "ttl": 1, "value": 10}}
+    state.sync_unset(1)
+    assert state._state == {}
+
+
+def test_sync_unset_without_data():
+    state = MemoryState()
+    assert state._state == {}
+    state.sync_unset(1)
+    assert state._state == {}
+
+
+@pytest.mark.asyncio
+async def test_async_unset_with_data():
+    state = MemoryState()
+    with freeze_time("2023-01-14 12:00:01"):
+        await state.async_set(1, 10, 1)
+    assert state._state == {1: {"created_at": 1673697601.0, "ttl": 1, "value": 10}}
+    await state.async_unset(1)
+    assert state._state == {}
+
+
+@pytest.mark.asyncio
+async def test_async_unset_without_data():
+    state = MemoryState()
+    assert state._state == {}
+    await state.async_unset(1)
+    assert state._state == {}
