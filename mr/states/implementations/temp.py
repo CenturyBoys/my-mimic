@@ -1,9 +1,10 @@
 """
 Memory state implementation
 """
+
 import pickle
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from inspect import _empty
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -84,7 +85,7 @@ class TempFileState(IState):
 
     @staticmethod
     def __unpickle_with_header(pack_bytes: bytes) -> Optional[any]:
-        datetime.now(timezone.utc).timestamp()
+        now_timestamp = datetime.now(timezone.utc).timestamp()
         pack = pickle.loads(pack_bytes)
         register_timestamp = pack.get("created_at")
         _ttl = pack.get("ttl")

@@ -1,10 +1,12 @@
 """
 Mr Mime is a function decorator for cache/memoization
 """
+
 import functools
 import hashlib
 import inspect
 import itertools
+from contextlib import asynccontextmanager, contextmanager
 from inspect import _empty
 from typing import TypeVar
 
@@ -12,6 +14,7 @@ import meeseeks
 
 from mr.config import Config
 from mr.states.implementations.memory import MemoryState
+from mr.states.interface import IState
 
 T = TypeVar("T")
 
@@ -31,7 +34,7 @@ class Mime:
         """
         Replace the default config
 
-        :param config: Config. IS a instance os Config class
+        :param config: Config. IS an instance os Config class
         :return: None
         """
         cls._config = config
@@ -51,6 +54,22 @@ class Mime:
             )
         )
         return hashlib.sha256(hash_instance.encode()).hexdigest()
+
+    @asynccontextmanager
+    async def async_acquire_state(self) -> IState:
+        """
+        Acquire the current state implementation asynchronous
+        """
+        async with self._config.async_acquire_state() as state:
+            yield state
+
+    @contextmanager
+    def sync_acquire_state(self) -> IState:
+        """
+        Acquire the current state implementation synchronous
+        """
+        with self._config.async_acquire_state() as state:
+            yield state
 
     def __call__(self, callable_obj: T) -> T:
         _is_class = inspect.isclass(callable_obj)

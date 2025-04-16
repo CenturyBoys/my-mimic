@@ -15,6 +15,7 @@ meeseeks-singleton = "^0.4.2"
 redis = { version = "^4.6.0", optional = true}
 aiofile = { version = "^3.8.8 ", optional = true}
 
+
 [tool.poetry.extras]
 redis_edition = ["redis"]
 temp_edition = ["aiofile"]
@@ -27,11 +28,10 @@ documentation = "https://github.com/CenturyBoys/my-mimic"
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.0.0"
 mutatest = "^3.1.0"
-pylint = "^2.17.1"
 freezegun = "^1.2.2"
 pytest-asyncio = "^0.21.0"
-black = "^23.9.1"
 pre-commit = "^3.4.0"
+ruff = "^0.11.5"
 
 [build-system]
 requires = ["poetry-core"]
