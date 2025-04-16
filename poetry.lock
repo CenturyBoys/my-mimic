@@ -4,7 +4,7 @@
 name = "aiofile"
 version = "3.9.0"
 description = "Asynchronous file operations."
-optional = false
+optional = true
 python-versions = "<4,>=3.8"
 files = [
     {file = "aiofile-3.9.0-py3-none-any.whl", hash = "sha256:ce2f6c1571538cbdfa0143b04e16b208ecb0e9cb4148e528af8a640ed51cc8aa"},
@@ -18,7 +18,7 @@ caio = ">=0.9.0,<0.10.0"
 name = "async-timeout"
 version = "5.0.1"
 description = "Timeout context manager for asyncio programs"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c"},
@@ -29,7 +29,7 @@ files = [
 name = "caio"
 version = "0.9.21"
 description = "Asynchronous file IO for Linux MacOS or Windows."
-optional = false
+optional = true
 python-versions = "<4,>=3.7"
 files = [
     {file = "caio-0.9.21-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:a80ae4838696c8e40d860f3de7afea018be4e96bd126706501b1cf34c32c7655"},
@@ -465,21 +465,21 @@ files = [
 
 [[package]]
 name = "redis"
-version = "5.2.1"
+version = "4.6.0"
 description = "Python client for Redis database and key-value store"
-optional = false
-python-versions = ">=3.8"
+optional = true
+python-versions = ">=3.7"
 files = [
-    {file = "redis-5.2.1-py3-none-any.whl", hash = "sha256:ee7e1056b9aea0f04c6c2ed59452947f34c4940ee025f5dd83e6a6418b6989e4"},
-    {file = "redis-5.2.1.tar.gz", hash = "sha256:16f2e22dff21d5125e8481515e386711a34cbec50f0e44413dd7d9c060a54e0f"},
+    {file = "redis-4.6.0-py3-none-any.whl", hash = "sha256:e2b03db868160ee4591de3cb90d40ebb50a90dd302138775937f6a42b7ed183c"},
+    {file = "redis-4.6.0.tar.gz", hash = "sha256:585dc516b9eb042a619ef0a39c3d7d55fe81bdb4df09a52c9cdde0d07bf1aa7d"},
 ]
 
 [package.dependencies]
-async-timeout = {version = ">=4.0.3", markers = "python_full_version < \"3.11.3\""}
+async-timeout = {version = ">=4.0.2", markers = "python_full_version <= \"3.11.2\""}
 
 [package.extras]
-hiredis = ["hiredis (>=3.0.0)"]
-ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==23.2.1)", "requests (>=2.31.0)"]
+hiredis = ["hiredis (>=1.0.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
 
 [[package]]
 name = "ruff"
@@ -609,4 +609,4 @@ temp-edition = ["aiofile"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "bd8f77706444c751aef43deb50e957c247332facdd7e4a7c011501cc300f33fa"
+content-hash = "2cde326e2d58affca237fe0f7bbd4b495f81e2e1e03b4423fb9bfd539f788758"
