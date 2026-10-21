@@ -33,14 +33,28 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install uv
         uses: astral-sh/setup-uv@v6
+      - name: Resolve version
+        id: version
+        run: echo "value=$(uv version --short)" >> "$GITHUB_OUTPUT"
+      - name: Check if version is already on PyPI
+        id: published
+        # Publishing runs on every push to main (same rule as the reference repos),
+        # so skip when the current version already exists — bump the version in
+        # pyproject.toml to release. This keeps unchanged merges a clean no-op.
+        run: |
+          if curl -sfI "https://pypi.org/pypi/my-mimic/${{ steps.version.outputs.value }}/json" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::my-mimic ${{ steps.version.outputs.value }} already on PyPI, skipping publish"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build distributions
+        if: steps.published.outputs.exists == 'false'
         run: uv build
       - name: Publish to PyPI
-        # Runs on every push to main (same rule as the reference repos). Bump the
-        # version in pyproject.toml per merge; --check-url skips the upload when the
-        # current version is already on PyPI, so unchanged merges don't fail the run.
+        if: steps.published.outputs.exists == 'false'
         # Uses Trusted Publishing when configured on PyPI; otherwise the
         # UV_PUBLISH_TOKEN secret is picked up.
-        run: uv publish --check-url https://pypi.org/simple/my-mimic/
+        run: uv publish
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
