@@ -32,8 +32,23 @@
                                                                             By CenturyBoys
 ```
 
+[![CI](https://github.com/CenturyBoys/my-mimic/actions/workflows/ci.yml/badge.svg)](https://github.com/CenturyBoys/my-mimic/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/CenturyBoys/my-mimic/branch/main/graph/badge.svg)](https://codecov.io/gh/CenturyBoys/my-mimic)
+[![PyPI](https://badge.fury.io/py/my-mimic.svg)](https://pypi.org/project/my-mimic/)
+[![Python](https://img.shields.io/pypi/pyversions/my-mimic.svg)](https://pypi.org/project/my-mimic/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-My Mimic is a function decorator for cache/memoization. They use the args and kwargs to create a hash to storage the function call result after the first call all function invoke will use already storage result.  
+My Mimic is a function decorator for cache/memoization. They use the args and kwargs to create a hash to storage the function call result after the first call all function invoke will use already storage result.
+
+## Installation
+
+```shell
+uv add my-mimic
+OR
+poetry add my-mimic
+OR
+pip install my-mimic
+```
 
 ### Configuration
 
