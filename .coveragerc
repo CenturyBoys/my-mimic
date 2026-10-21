@@ -1,7 +1,0 @@
-[report]
-exclude_lines =
-    @dataclass(slots=True, frozen=True)
-
-omit =
-    */interface*
-    *states/__init__.py
