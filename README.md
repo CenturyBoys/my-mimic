@@ -43,6 +43,7 @@ Below you can see the interface contract
 ```python
 from abc import ABC, abstractmethod
 
+
 class IState(ABC):
     """
     State interface
@@ -83,7 +84,6 @@ class IState(ABC):
         :param ttl: int. Seconds that the cache will have to live. Set None to never die
         :return:
         """
-
 ```
 
 To configure a new state you need to use `mr.Mime.set_config` function passing a config instance. The config accepts a `kwargs: dict` parameter, this parameter will be sent to the state instance.
@@ -120,6 +120,8 @@ This extra add the redis [package](https://pypi.org/project/redis/) in version `
 How to install extra packages?
 
 ```shell
+uv add 'my-mimic[redis_edition]'
+OR
 poetry add my-mimic -E redis_edition
 OR
 pip install 'my-mimic[redis_edition]'
@@ -131,10 +133,7 @@ You need pass the `REDIS_URL` parameter on configuration
 import mr
 
 mr.Mime.set_config(
-    config=mr.Config(
-        state=mr.states.RedisState,
-        state_kwargs={"REDIS_URL": "redis://"}
-    )
+    config=mr.Config(state=mr.states.RedisState, state_kwargs={"REDIS_URL": "redis://"})
 )
 ```
 
@@ -145,6 +144,8 @@ This extra add the aiofile [package](https://pypi.org/project/aiofile/) in versi
 How to install extra packages?
 
 ```shell
+uv add 'my-mimic[temp_edition]'
+OR
 poetry add my-mimic -E temp_edition
 OR
 pip install 'my-mimic[temp_edition]'
@@ -156,10 +157,11 @@ You can pass the `STATIC` parameter on configuration. When `True` disable the te
 
 ```python
 import mr
+
 mr.Mime.set_config(
     config=mr.Config(
-        state=mr.states.TempFileState, 
-        kwargs={"BASE_PATH": "/home/my_user", "STATIC": True}
+        state=mr.states.TempFileState,
+        kwargs={"BASE_PATH": "/home/my_user", "STATIC": True},
     )
 )
 ```
@@ -174,10 +176,12 @@ Mime works fine with sync and async functions too.
 import time
 import mr
 
+
 @mr.Mime(ttl=1)
 def cached_callback(param_a: int, param_b: int):
     print("Function was called")
     return param_a + param_b
+
 
 result = cached_callback(1, 2)
 print(result)
@@ -197,4 +201,35 @@ Function was called
 Await 2 seconds
 Function was called
 3
+```
+
+### Invalidation
+
+Every decorated function exposes an `invalidate` method that drops the cached entry
+for a specific set of arguments (the cache key is `sha256(func_name + args + kwargs)`).
+Call it with the same arguments you used to call the function.
+
+```python
+import mr
+
+
+@mr.Mime(ttl=60)
+def cached_callback(param_a: int, param_b: int):
+    return param_a + param_b
+
+
+cached_callback(1, 2)  # computed and cached
+cached_callback.invalidate(1, 2)  # drop the cached entry for (1, 2)
+cached_callback(1, 2)  # computed again
+```
+
+For async functions `invalidate` is awaitable:
+
+```python
+@mr.Mime(ttl=60)
+async def cached_callback(param_a: int, param_b: int):
+    return param_a + param_b
+
+
+await cached_callback.invalidate(1, 2)
 ```
