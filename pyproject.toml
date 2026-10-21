@@ -1,6 +1,6 @@
 [project]
 name = "my-mimic"
-version = "0.5.2"
+version = "0.6.0"
 description = "Cache/Memoization package"
 authors = [
     { name = "Marco Sievers de Almeida Ximit Gaia", email = "im.ximit@gmail.com" },
