@@ -1,9 +1,11 @@
 """
 Config for Mr Mime
 """
+
+from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
-from typing import Type
+from typing import Any
 
 from mr.states.interface import IState
 
@@ -14,36 +16,38 @@ class Config:
     Config class
     """
 
-    state: Type[IState]
-    state_kwargs: dict = field(default_factory=dict)
-    _state: IState = None
+    state: type[IState]
+    state_kwargs: dict[str, Any] = field(default_factory=dict)
+    _state: IState | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not issubclass(self.state, IState):
             raise TypeError("State class does not implement IState interface")
 
     @property
-    def initialized_state(self):
+    def initialized_state(self) -> IState:
         """
-        Initialized sate
+        Initialized state
         @return:
         """
         if self._state is None:
-            object.__setattr__(self, "_state", self.state(**self.state_kwargs))
+            state = self.state(**self.state_kwargs)
+            object.__setattr__(self, "_state", state)
+            return state
         return self._state
 
     @contextmanager
-    def sync_acquire_state(self) -> IState:
+    def sync_acquire_state(self) -> Iterator[IState]:
         """
         Get sync state
-        :return: SyncRedis
+        :return: IState
         """
         yield self.initialized_state
 
     @asynccontextmanager
-    async def async_acquire_state(self) -> IState:
+    async def async_acquire_state(self) -> AsyncIterator[IState]:
         """
-        Get sync state
-        :return: SyncRedis
+        Get async state
+        :return: IState
         """
         yield self.initialized_state

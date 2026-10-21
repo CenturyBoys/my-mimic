@@ -2,8 +2,8 @@
 Hi I Mr Mime, go do mimic
 """
 
-from .mime import Mime
 from .config import Config
+from .mime import Mime
 from .states.interface import IState
 
 __all__ = [

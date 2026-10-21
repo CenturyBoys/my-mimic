@@ -5,7 +5,7 @@ from inspect import _empty
 from pathlib import Path
 from random import randint
 from tempfile import TemporaryDirectory
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from freezegun import freeze_time
@@ -27,7 +27,7 @@ def test_default():
 
 def test_static_without_base_path():
     state = TempFileState(STATIC=True)
-    assert str(state._path) == str((Path(tempfile.gettempdir())))
+    assert str(state._path) == str(Path(tempfile.gettempdir()))
 
 
 def test_static_with_base_path():
