@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
-from typing import Type
 
 import pytest
 from freezegun import freeze_time
 
 import mr
-from mr import Mime, Config
+from mr import Config, Mime
 from mr.mime import singleton_container
 from mr.states.implementations.memory import MemoryState
 from tests.config.test_config import StubState
@@ -18,7 +17,7 @@ def test_mime_singleton():
 
 
 @pytest.fixture()
-def mime_default() -> Type[Mime]:
+def mime_default() -> type[Mime]:
     singleton_container.clean_references()
     Mime.set_config(config=Config(state=MemoryState))
     return Mime
@@ -92,3 +91,34 @@ async def test_async_mimic_get_renew_return(mime_default):
     with freeze_time(datetime_now):
         return_a2 = await cached_callback(0)
     assert return_a1 != return_a2
+
+
+def test_sync_mimic_invalidate(mime_default):
+    @mime_default(ttl=1)
+    def cached_callback(param_a: int):
+        return datetime.utcnow().timestamp()
+
+    datetime_now = datetime.utcnow()
+    with freeze_time(datetime_now):
+        return_a1 = cached_callback(0)
+        assert cached_callback(0) == return_a1
+        cached_callback.invalidate(0)
+    datetime_now += timedelta(seconds=2)
+    with freeze_time(datetime_now):
+        assert cached_callback(0) != return_a1
+
+
+@pytest.mark.asyncio
+async def test_async_mimic_invalidate(mime_default):
+    @mime_default(ttl=1)
+    async def cached_callback(param_a: int):
+        return datetime.utcnow().timestamp()
+
+    datetime_now = datetime.utcnow()
+    with freeze_time(datetime_now):
+        return_a1 = await cached_callback(0)
+        assert await cached_callback(0) == return_a1
+        await cached_callback.invalidate(0)
+    datetime_now += timedelta(seconds=2)
+    with freeze_time(datetime_now):
+        assert await cached_callback(0) != return_a1
