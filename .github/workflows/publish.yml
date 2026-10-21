@@ -1,0 +1,46 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --all-extras
+      - name: Ruff lint
+        run: uv run ruff check .
+      - name: Mypy (strict)
+        run: uv run mypy
+      - name: Tests
+        run: uv run pytest
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # Required for PyPI Trusted Publishing (OIDC).
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Build distributions
+        run: uv build
+      - name: Publish to PyPI
+        # Runs on every push to main (same rule as the reference repos). Bump the
+        # version in pyproject.toml per merge; --check-url skips the upload when the
+        # current version is already on PyPI, so unchanged merges don't fail the run.
+        # Uses Trusted Publishing when configured on PyPI; otherwise the
+        # UV_PUBLISH_TOKEN secret is picked up.
+        run: uv publish --check-url https://pypi.org/simple/my-mimic/
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
